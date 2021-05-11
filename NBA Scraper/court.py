@@ -32,7 +32,7 @@ def createCourt(court, color):
     # Set axis limits
     court.set_xlim(-250, 250)
     court.set_ylim(0, 470)
-  
+
 
 fig = plt.figure(figsize=(4, 3.76))
 court = fig.add_axes([0, 0, 1, 1])
