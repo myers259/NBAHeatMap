@@ -1,6 +1,7 @@
 from urllib.parse import urljoin
 from html.parser import HTMLParser
 from urllib.request import urlopen
+from court import genCourt
 
 class Collector(HTMLParser):
 
@@ -91,14 +92,17 @@ class Collector(HTMLParser):
         return self.shotData
 
 def format(season, data):
-    shots = {'atRim': 0, '3to10': 0, '10to16': 0, '16to3pt': 0, '3pt':0}
+    shots = {'atRim': [0, 0], '3to10': [0, 0], '10to16': [0, 0], '16to3pt': [0, 0], '3pt':[0, 0]}
     i = 0
     for key in shots.keys():
-        shots[key] = data[season]['fg_pctShot Distance'][i]
+        shots[key] = [int(data[season]['fgShot Distance'][i]), int(data[season]['fgaShot Distance'][i])]
         i += 1
 
+    midRange = (shots['10to16'][0] + shots['16to3pt'][0])/(shots['10to16'][1] + shots['16to3pt'][1])
+    paint = (shots['atRim'][0] + shots['3to10'][0])/(shots['atRim'][1] + shots['3to10'][1])
+    formatedShots = {'paint': paint, 'midRange': midRange, '3pt': shots['3pt'][0]/shots['3pt'][1]}
     
-    return shots
+    return formatedShots
 
 
 
@@ -115,6 +119,10 @@ def main():
     collectSeason = Collector(player, season)
     contentS = urlopen(collectSeason.url).read().decode()
     collectSeason.feed(contentS)
-    print(format(season, collectSeason.getData()))
+    prct = format(season, collectSeason.getData())
+    print(prct)
+    genCourt(prct)
+    
+   
 main()
 
