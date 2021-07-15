@@ -5,8 +5,10 @@ import seaborn as sns
 
 
 class Court():
-    def __init__(self, prct):
+    def __init__(self, prct, player, season):
         self.prct = prct
+        self.player = player
+        self.seasonPicked = season
 
     def createCourt(self):
         # Drawing of court from https://github.com/venkatesannaveen/medium-articles/blob/master/nba_shotchart.ipynb
@@ -62,7 +64,7 @@ class Court():
         else:
             length = math.ceil((leagueAvg - minVal)*100)
             palette = sns.color_palette("light:b_r", length)
-            return palette[math.ceil((leagueAvg - playerVal)*100)]
+            return palette[math.ceil((leagueAvg - playerVal)*100) - 1] # minus 1 because list starts at 0
 
     def genCourt(self):
         """ generates the visualization """
@@ -70,8 +72,14 @@ class Court():
         fig = plt.figure(figsize=(4, 3.76))
         self.court = fig.add_axes([0, 0, 1, 1])
         self.shotColors = {'paint': self.genColor(.58, .80, .32, self.prct['paint']), 'midRange': self.genColor(.42, .70, .20, self.prct['midRange']),
-                           '3pt': self.genColor(.36, .50, .18, self.prct['3pt'])
+                           '3pt': self.genColor(.36, .50, 0, self.prct['3pt'])
                            }
         self.createCourt()
+
+        plt.text(0, 430, self.player + ",\n" + self.seasonPicked + " Season", horizontalalignment='center')
+
+        plt.text(1, 320, "3pt: " + str(math.trunc(self.prct['3pt']*100)) + "%" , horizontalalignment='center')
+        plt.text(1, 192, "Midrange: " + str(math.trunc(self.prct['midRange']*100)) + "%" , horizontalalignment='center')
+        plt.text(1, 18, "Paint: " + str(math.trunc(self.prct['paint']*100)) + "%" , horizontalalignment='center')
 
         plt.show()

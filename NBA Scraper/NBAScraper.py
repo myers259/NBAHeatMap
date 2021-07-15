@@ -95,30 +95,37 @@ class ShootingChart():
     def __init__(self):
         pass
 
-    def format(self, season, data):
+    def format(self, data):
         """ Returns a dictionary of formated shooting data  """
 
         shots = {'atRim': [0, 0], '3to10': [0, 0], '10to16': [
             0, 0], '16to3pt': [0, 0], '3pt': [0, 0]}
         i = 0
         for key in shots.keys():
-            shots[key] = [int(data[season]['fgShot Distance'][i]), int(
-                data[season]['fgaShot Distance'][i])]
-            i += 1
+            if i  < len(data[self.seasonPicked]['fgShot Distance']):
+                shots[key] = [int(data[self.seasonPicked]['fgShot Distance'][i]), int(
+                data[self.seasonPicked]['fgaShot Distance'][i])]
+                i += 1
+            else:
+                shots[key] = [0,0]
 
         midRange = (shots['10to16'][0] + shots['16to3pt'][0]) / \
             (shots['10to16'][1] + shots['16to3pt'][1])
         paint = (shots['atRim'][0] + shots['3to10'][0]) / \
             (shots['atRim'][1] + shots['3to10'][1])
+        three = 0
+        if shots['3pt'][1] != 0:
+            three = shots['3pt'][0]/shots['3pt'][1]
+        
         self.formatedShots = {
-            'paint': paint, 'midRange': midRange, '3pt': shots['3pt'][0]/shots['3pt'][1]}
+            'paint': paint, 'midRange': midRange, '3pt': three}
 
     def playerSeasonPicker(self):
         """ Asks the user for a player and then for which season they would like to visualize """
 
-        player = input("Please enter in a players name :  ")
+        self.player = input("Please enter in a players name :  ")
 
-        collect = Collector(player)
+        collect = Collector(self.player)
         content = urlopen(collect.url).read().decode()
         collect.feed(content)
 
@@ -126,17 +133,17 @@ class ShootingChart():
         for season in collect.getData().keys():
             print(season)
 
-        season = input("Which season would you like to map :  ")
+        self.seasonPicked = input("Which season would you like to map :  ")
 
-        collectSeason = Collector(player, season)
+        collectSeason = Collector(self.player, self.seasonPicked)
         contentS = urlopen(collectSeason.url).read().decode()
         collectSeason.feed(contentS)
 
-        self.format(season, collectSeason.getData())
+        self.format(collectSeason.getData())
 
     def run(self):
         self.playerSeasonPicker()
-        court = Court(self.formatedShots)
+        court = Court(self.formatedShots, self.player, self.seasonPicked)
         court.genCourt()
 
 
