@@ -71,8 +71,8 @@ class Court():
 
         fig = plt.figure(figsize=(4, 3.76))
         self.court = fig.add_axes([0, 0, 1, 1])
-        self.shotColors = {'paint': self.genColor(.58, .80, .32, self.prct['paint']), 'midRange': self.genColor(.42, .70, .20, self.prct['midRange']),
-                           '3pt': self.genColor(.36, .50, 0, self.prct['3pt'])
+        self.shotColors = {'paint': self.genColor(self.prct['avgPaint'], .80, .32, self.prct['paint']), 'midRange': self.genColor(self.prct['avgMidRange'], .70, .20, self.prct['midRange']),
+                           '3pt': self.genColor(self.prct['avg3pt'], .50, 0, self.prct['3pt'])
                            }
         self.createCourt()
 
@@ -81,5 +81,7 @@ class Court():
         plt.text(1, 320, "3pt: " + str(math.trunc(self.prct['3pt']*100)) + "%" , horizontalalignment='center')
         plt.text(1, 192, "Midrange: " + str(math.trunc(self.prct['midRange']*100)) + "%" , horizontalalignment='center')
         plt.text(1, 18, "Paint: " + str(math.trunc(self.prct['paint']*100)) + "%" , horizontalalignment='center')
+
+        plt.text(-235, 410, "League Averages : Paint {}%, Midrange {}%, 3pt {}%".format(math.trunc(self.prct['avgPaint'] * 100), math.trunc(self.prct['avgMidRange'] * 100), math.trunc(self.prct['avg3pt'] * 100)))
 
         plt.show()
